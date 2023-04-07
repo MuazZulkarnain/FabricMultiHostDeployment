@@ -35,7 +35,7 @@ const query = async (channelName, chaincodeName, args, fcn, username, org_name) 
         // Create a new gateway for connecting to our peer node.
         const gateway = new Gateway();
         await gateway.connect(ccp, {
-            wallet, identity: username, discovery: { enabled: true, asLocalhost: false }
+            wallet, identity: username, discovery: { enabled: true, asLocalhost: true }
         });
 
         // Get the network (channel) our contract is deployed to.
@@ -45,15 +45,10 @@ const query = async (channelName, chaincodeName, args, fcn, username, org_name) 
         const contract = network.getContract(chaincodeName);
         let result;
 
-        if (fcn == "queryCar" || fcn =="queryCarsByOwner" || fcn == 'getHistoryForAsset' || fcn=='restictedMethod') {
+        if (fcn == "queryToken" || fcn =="queryTokensByOwner" || fcn == 'getHistoryForAsset') {
             console.log(`arguments type is------------------------------------------------------------- ${typeof args}`)
             console.log(`length of args is------------------------------------------------------------ ${args.length}`)
             result = await contract.evaluateTransaction(fcn, args[0]);
-
-        } else if (fcn == "readPrivateCar" || fcn == "queryPrivateDataHash"
-        || fcn == "collectionCarPrivateDetails") {
-            result = await contract.evaluateTransaction(fcn, args[0], args[1]);
-            // return result
 
         }
 

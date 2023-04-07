@@ -16,7 +16,7 @@ const helper = require('./helper')
 //     return new MyTransactionEventHandler(transactionId, network, myOrgPeers);
 // }
 
-const invokeTransaction = async (channelName, chaincodeName, fcn, args, username, org_name, transientData) => {
+const invokeTransaction = async (channelName, chaincodeName, fcn, args, username, org_name) => {
     try {
         logger.debug(util.format('\n============ invoke transaction on channel %s ============\n', channelName));
 
@@ -43,9 +43,9 @@ const invokeTransaction = async (channelName, chaincodeName, fcn, args, username
 
 
         const connectOptions = {
-            wallet, identity: username, discovery: { enabled: true, asLocalhost: false },
+            wallet, identity: username, discovery: { enabled: true, asLocalhost: False },
             eventHandlerOptions: {
-                commitTimeout: 100,
+                commitTimeout: 300,
                 strategy: DefaultEventHandlerStrategies.NETWORK_SCOPE_ALLFORTX
             }
             // transaction: {
@@ -91,28 +91,16 @@ const invokeTransaction = async (channelName, chaincodeName, fcn, args, username
         // }
         let result
         let message;
-        if (fcn === "createCar" || fcn === "createPrivateCarImplicitForOrg1"
-            || fcn == "createPrivateCarImplicitForOrg2") {
-            result = await contract.submitTransaction(fcn, args[0], args[1], args[2], args[3], args[4]);
-            message = `Successfully added the car asset with key ${args[0]}`
+        if (fcn === "createToken") {
+            result = await contract.submitTransaction(fcn, args[0], args[1], args[2], args[3]);
+            message = `Successfully added the token asset with key ${args[0]}`
 
-        } else if (fcn === "changeCarOwner") {
-            result = await contract.submitTransaction(fcn, args[0], args[1]);
-            message = `Successfully changed car owner with key ${args[0]}`
-        } else if (fcn == "createPrivateCar" || fcn == "updatePrivateData") {
-            console.log(`Transient data is : ${transientData}`)
-            let carData = JSON.parse(transientData)
-            console.log(`car data is : ${JSON.stringify(carData)}`)
-            let key = Object.keys(carData)[0]
-            const transientDataBuffer = {}
-            transientDataBuffer[key] = Buffer.from(JSON.stringify(carData.car))
-            result = await contract.createTransaction(fcn)
-                .setTransient(transientDataBuffer)
-                .submit()
-            message = `Successfully submitted transient data`
-        }
+        } else if (fcn === "changeTokenOwner") {
+            result = await contract.submitTransaction(fcn, args[0], args[2]);
+            message = `Successfully changed token owner with key ${args[0]}`
+        } 
         else {
-            return `Invocation require either createCar or changeCarOwner as function but got ${fcn}`
+            return `Invocation require either createToken or changeTokenOwner as function but got ${fcn}`
         }
         await gateway.disconnect();
 

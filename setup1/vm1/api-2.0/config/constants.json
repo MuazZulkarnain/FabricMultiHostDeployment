@@ -1,5 +1,5 @@
 {
-    "host": "localhost",
+    "host": "117.53.155.107",
     "port": "4000",
     "jwt_expiretime": "36000",
     "channelName": "mychannel",

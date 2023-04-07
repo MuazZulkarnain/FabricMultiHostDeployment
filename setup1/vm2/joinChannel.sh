@@ -52,8 +52,8 @@ updateAnchorPeers() {
 
 }
 
-updateAnchorPeers
-
-# fetchChannelBlock
-# joinChannel
 # updateAnchorPeers
+
+fetchChannelBlock
+joinChannel
+updateAnchorPeers
