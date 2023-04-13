@@ -45,6 +45,8 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 		return s.initLedger(APIstub)
 	case "createToken":
 		return s.createToken(APIstub, args)
+	case "retireToken":
+		return s.retireToken(APIstub, args)
 	case "queryAllTokens":
 		return s.queryAllTokens(APIstub)
 	case "changeTokenOwner":
@@ -58,16 +60,6 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 	}
 
 	// return shim.Error("Invalid Smart Contract function name.")
-}
-
-func (s *SmartContract) queryToken(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
-
-	if len(args) != 1 {
-		return shim.Error("Incorrect number of arguments. Expecting 1")
-	}
-
-	tokenAsBytes, _ := APIstub.GetState(args[0])
-	return shim.Success(tokenAsBytes)
 }
 
 func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Response {
@@ -122,6 +114,76 @@ func (s *SmartContract) createToken(APIstub shim.ChaincodeStubInterface, args []
 	responsePayloadAsBytes, _ := json.Marshal(responsePayload)
 
 	return shim.Success(responsePayloadAsBytes)
+}
+
+func (s *SmartContract) changeTokenOwner(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 2 {
+		return shim.Error("Incorrect number of arguments. Expecting 2")
+	}
+
+	tokenAsBytes, _ := APIstub.GetState(args[0])
+	token := Token{}
+
+	json.Unmarshal(tokenAsBytes, &token)
+	token.Owner = args[1]
+
+	tokenAsBytes, _ = json.Marshal(token)
+	APIstub.PutState(args[0], tokenAsBytes)
+
+	// Get the transaction ID (txID)
+	txID := APIstub.GetTxID()
+
+	// Build the response payload
+	responsePayload := struct {
+		Token Token  `json:"token"`
+		TxID  string `json:"txID"`
+	}{
+		Token: token,
+		TxID:  txID,
+	}
+
+	responsePayloadAsBytes, _ := json.Marshal(responsePayload)
+
+	return shim.Success(responsePayloadAsBytes)
+}
+
+func (s *SmartContract) retireToken(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+	if len(args) != 1 {
+		return shim.Error("Incorrect number of arguments. Expecting 1")
+	}
+
+	err := APIstub.DelState(args[0])
+	if err != nil {
+		return shim.Error(fmt.Sprintf("Failed to retire token with ID %s: %s", args[0], err.Error()))
+	}
+
+	// Get the transaction ID (txID)
+	txID := APIstub.GetTxID()
+
+	// Build the response payload
+	responsePayload := struct {
+		TokenID string `json:"tokenID"`
+		TxID    string `json:"txID"`
+	}{
+		TokenID: args[0],
+		TxID:    txID,
+	}
+
+	responsePayloadAsBytes, _ := json.Marshal(responsePayload)
+
+	return shim.Success(responsePayloadAsBytes)
+}
+
+
+func (s *SmartContract) queryToken(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 1 {
+		return shim.Error("Incorrect number of arguments. Expecting 1")
+	}
+
+	tokenAsBytes, _ := APIstub.GetState(args[0])
+	return shim.Success(tokenAsBytes)
 }
 
 func (s *SmartContract) queryTokensByOwner(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
@@ -220,24 +282,6 @@ func (s *SmartContract) queryAllTokens(APIstub shim.ChaincodeStubInterface) sc.R
 	fmt.Printf("- queryAllTokens:\n%s\n", buffer.String())
 
 	return shim.Success(buffer.Bytes())
-}
-
-func (s *SmartContract) changeTokenOwner(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
-
-	if len(args) != 2 {
-		return shim.Error("Incorrect number of arguments. Expecting 2")
-	}
-
-	tokenAsBytes, _ := APIstub.GetState(args[0])
-	token := Token{}
-
-	json.Unmarshal(tokenAsBytes, &token)
-	token.Owner = args[1]
-
-	tokenAsBytes, _ = json.Marshal(token)
-	APIstub.PutState(args[0], tokenAsBytes)
-
-	return shim.Success(tokenAsBytes)
 }
 
 func (t *SmartContract) getHistoryForAsset(stub shim.ChaincodeStubInterface, args []string) sc.Response {
