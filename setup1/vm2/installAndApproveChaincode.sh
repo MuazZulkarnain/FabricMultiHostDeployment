@@ -93,6 +93,7 @@ checkCommitReadyness() {
 
 # checkCommitReadyness
 
+presetup
 packageChaincode
 installChaincode
 queryInstalled

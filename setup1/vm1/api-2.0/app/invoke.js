@@ -16,7 +16,7 @@ const helper = require('./helper')
 //     return new MyTransactionEventHandler(transactionId, network, myOrgPeers);
 // }
 
-const invokeTransaction = async (channelName, chaincodeName, fcn, args, username, org_name) => {
+const invokeTransaction = async (channelName, chaincodeName, fcn, args, username, org_name, transientData) => {
     try {
         logger.debug(util.format('\n============ invoke transaction on channel %s ============\n', channelName));
 
@@ -43,9 +43,9 @@ const invokeTransaction = async (channelName, chaincodeName, fcn, args, username
 
 
         const connectOptions = {
-            wallet, identity: username, discovery: { enabled: true, asLocalhost: False },
+            wallet, identity: username, discovery: { enabled: true, asLocalhost: false },
             eventHandlerOptions: {
-                commitTimeout: 300,
+                commitTimeout: 100,
                 strategy: DefaultEventHandlerStrategies.NETWORK_SCOPE_ALLFORTX
             }
             // transaction: {
@@ -57,73 +57,40 @@ const invokeTransaction = async (channelName, chaincodeName, fcn, args, username
         const gateway = new Gateway();
         await gateway.connect(ccp, connectOptions);
 
-        // Get the network (channel) our contract is deployed to.
         const network = await gateway.getNetwork(channelName);
-
         const contract = network.getContract(chaincodeName);
 
-        // let result
-        // let message;
-        // switch (fcn) {
-        //     case "CreateInvoice":
-        //         result = await contract.submitTransaction(fcn, args[0]);
-        //         // obj = JSON.stringify(JSON.parse(args[0]))
-        //         // console.log(JSON.parse(args[0]))
-        //         message = `Successfully added the Invoice Data`
-        //         break;
-        //     case "UpdateInvoice":
-        //         if (org_name == "Org1") {
-        //             return { message: "Only Organization 2 is allowed to add transactions" }
-        //         } else {
-        //             result = await contract.submitTransaction(fcn, args[0], args[1], args[2]);
-        //             // obj = JSON.stringify(JSON.parse(args[0]))
-        //             // console.log(JSON.parse(args[0]))
-        //             message = `Successfully updated the Invoice Data`
-        //             break;
-        //         }
-
-
-        //     // case ""
-
-        //     default:
-        //         return utils.getResponsePayload("Please send correct chaincode function name", null, false)
-        //         break;
-        // }
-        let result
+        let result;
         let message;
+
         if (fcn === "createToken") {
             result = await contract.submitTransaction(fcn, args[0], args[1], args[2], args[3]);
-            message = `Successfully added the token asset with key ${args[0]}`
-
+            result = JSON.parse(result.toString());
+            message = `Successfully added the token asset with key ${args[0]}, transaction ID ${result.txID}`
         } else if (fcn === "changeTokenOwner") {
-            result = await contract.submitTransaction(fcn, args[0], args[2]);
-            message = `Successfully changed token owner with key ${args[0]}`
-        } 
-        else {
-            return `Invocation require either createToken or changeTokenOwner as function but got ${fcn}`
+            result = await contract.submitTransaction(fcn, args[0], args[1]);
+            result = JSON.parse(result.toString());
+            message = `Successfully changed token owner with key ${args[0]}, , transaction ID ${result.txID}`
+        } else if (fcn === "retireToken") {
+            result = await contract.submitTransaction(fcn, args[0]);
+            result = JSON.parse(result.toString());
+            message = `Successfully retired token with key ${args[0]}, , transaction ID ${result.txID}`
+        } else {
+            return `Invocation requires either createToken or changeTokenOwner as function but got ${fcn}`
         }
+
         await gateway.disconnect();
 
-        // result = JSON.parse(result.toString());
-
         let response = {
-            message: message
-            // result
+            message: message,
+            TxId: result.txID
         }
-
-        // let response = {
-        //     message: message,
-        //     result
-        // }
 
         return response;
 
-
     } catch (error) {
-
         console.log(`Getting error: ${error}`)
         return error.message
-
     }
 }
 
