@@ -19,9 +19,9 @@ type SmartContract struct {
 
 // Token :  Define the token structure, with 3 properties.  Structure tags are used by encoding/json library
 type Token struct {
-	Amount  string 	`json:"amount"`
-	Owner  	string 	`json:"owner"`
-	Source 	string 	`json:"source"`
+	Amount  int     `json:"amount"`
+	Owner   string  `json:"owner"`
+	Source  string  `json:"source"`
 }
 
 // Init ;  Method for initializing smart contract
@@ -45,12 +45,14 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 		return s.initLedger(APIstub)
 	case "createToken":
 		return s.createToken(APIstub, args)
+	case "updateTokenVolume":
+		return s.updateTokenVolume(APIstub, args)
+	case "changeTokenOwner":
+		return s.changeTokenOwner(APIstub, args)
 	case "retireToken":
 		return s.retireToken(APIstub, args)
 	case "queryAllTokens":
 		return s.queryAllTokens(APIstub)
-	case "changeTokenOwner":
-		return s.changeTokenOwner(APIstub, args)
 	case "getHistoryForAsset":
 		return s.getHistoryForAsset(APIstub, args)
 	case "queryTokensByOwner":
@@ -86,7 +88,12 @@ func (s *SmartContract) createToken(APIstub shim.ChaincodeStubInterface, args []
 		return shim.Error("Incorrect number of arguments. Expecting 4")
 	}
 
-	var token = Token{Amount: args[1], Owner: args[2], Source: args[3]}
+	amount, err := strconv.Atoi(args[1])
+	if err != nil {
+		return shim.Error("Invalid amount. Expecting integer value")
+	}
+
+	var token = Token{Amount: amount, Owner: args[2], Source: args[3]}
 
 	tokenAsBytes, _ := json.Marshal(token)
 	APIstub.PutState(args[0], tokenAsBytes)
@@ -112,6 +119,58 @@ func (s *SmartContract) createToken(APIstub shim.ChaincodeStubInterface, args []
 	}
 
 	responsePayloadAsBytes, _ := json.Marshal(responsePayload)
+
+	return shim.Success(responsePayloadAsBytes)
+}
+
+func (s *SmartContract) updateTokenVolume(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+	if len(args) != 2 {
+		return shim.Error("Incorrect number of arguments. Expecting 2")
+	}
+
+	tokenAsBytes, err := APIstub.GetState(args[0])
+	if err != nil {
+		return shim.Error("Failed to get token: " + err.Error())
+	}
+
+	token := Token{}
+	err = json.Unmarshal(tokenAsBytes, &token)
+	if err != nil {
+		return shim.Error("Failed to unmarshal token: " + err.Error())
+	}
+
+	newVolume, err := strconv.Atoi(args[1])
+	if err != nil {
+		return shim.Error("Invalid volume: " + err.Error())
+	}
+
+	token.Amount = newVolume
+	tokenAsBytes, err = json.Marshal(token)
+	if err != nil {
+		return shim.Error("Failed to marshal token: " + err.Error())
+	}
+
+	err = APIstub.PutState(args[0], tokenAsBytes)
+	if err != nil {
+		return shim.Error("Failed to update token: " + err.Error())
+	}
+
+	// Get the transaction ID (txID)
+	txID := APIstub.GetTxID()
+
+	// Build the response payload
+	responsePayload := struct {
+		Token Token  `json:"token"`
+		TxID  string `json:"txID"`
+	}{
+		Token: token,
+		TxID:  txID,
+	}
+
+	responsePayloadAsBytes, err := json.Marshal(responsePayload)
+	if err != nil {
+		return shim.Error("Failed to marshal response: " + err.Error())
+	}
 
 	return shim.Success(responsePayloadAsBytes)
 }
