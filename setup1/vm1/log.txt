@@ -1,2 +1,3 @@
 Installed chaincodes on peer:
-Package ID: prsb_1:afe2eff9beb1e6de30f676264e4d3d9019c8be75a06a0dd0819e4f68794af11b, Label: prsb_1
+Package ID: prsb_1:b3ee6ed720704a53470f32697adc26c903bae370d4b117c6133d78a7ef58d473, Label: prsb_1
+Package ID: prsb_2:7127b506efce4ce9d1056566f33096e363bc59ef07051e75d98870e7a200ebf7, Label: prsb_2

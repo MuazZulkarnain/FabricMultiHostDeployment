@@ -7,6 +7,10 @@ services:
 
   ca_orderer:
     image: hyperledger/fabric-ca
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
       - FABRIC_CA_SERVER_CA_NAME=ca-orderer

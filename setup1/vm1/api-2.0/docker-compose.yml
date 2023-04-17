@@ -6,6 +6,10 @@ networks:
 services:
   api:
     image: api:1.0
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
     build: .
     networks:
       - test

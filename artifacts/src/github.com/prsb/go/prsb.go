@@ -10,18 +10,18 @@ import (
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	sc "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/common/flogging"
-
 )
 
 // SmartContract Define the Smart Contract structure
 type SmartContract struct {
 }
 
-// Token :  Define the token structure, with 3 properties.  Structure tags are used by encoding/json library
+// Token :  Define the token structure, with 4 properties.  Structure tags are used by encoding/json library
 type Token struct {
-	Amount  int     `json:"amount"`
-	Owner   string  `json:"owner"`
-	Source  string  `json:"source"`
+	Amount         float64 `json:"amount"`
+	Owner          string  `json:"owner"`
+	Source         string  `json:"source"`
+	ConversionRate float64 `json:"conversion_rate"`
 }
 
 // Init ;  Method for initializing smart contract
@@ -55,8 +55,6 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 		return s.queryAllTokens(APIstub)
 	case "getHistoryForAsset":
 		return s.getHistoryForAsset(APIstub, args)
-	case "queryTokensByOwner":
-		return s.queryTokensByOwner(APIstub, args)
 	default:
 		return shim.Error("Invalid Smart Contract function name.")
 	}
@@ -66,10 +64,10 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 
 func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Response {
 	tokens := []Token{
-		Token{Amount: "2.31", Owner: "PRSB-A", Source: "PRSB-A"},
-		Token{Amount: "19.87", Owner: "PRSB-B", Source: "PRSB-B"},
-		Token{Amount: "4.11", Owner: "PRSB-C", Source: "PRSB-C"},
-		Token{Amount: "7.49", Owner: "PRSB-D", Source: "PRSB-D"},
+		{Amount: 2.31, Owner: "PRSB-A", Source: "PRSB-A", ConversionRate: 0.6689},
+		{Amount: 19.87, Owner: "PRSB-B", Source: "PRSB-B", ConversionRate: 0.6689},
+		{Amount: 4.11, Owner: "PRSB-C", Source: "PRSB-C", ConversionRate: 0.6689},
+		{Amount: 7.49, Owner: "PRSB-D", Source: "PRSB-D", ConversionRate: 0.6689},
 	}
 
 	i := 0
@@ -84,16 +82,21 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 
 func (s *SmartContract) createToken(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	if len(args) != 4 {
+	if len(args) != 5 {
 		return shim.Error("Incorrect number of arguments. Expecting 4")
 	}
 
-	amount, err := strconv.Atoi(args[1])
+	amount, err := strconv.ParseFloat(args[1], 64)
 	if err != nil {
-		return shim.Error("Invalid amount. Expecting integer value")
+		return shim.Error("Invalid amount: " + err.Error())
 	}
 
-	var token = Token{Amount: amount, Owner: args[2], Source: args[3]}
+	conversion_rate, err := strconv.ParseFloat(args[4], 64)
+	if err != nil {
+		return shim.Error("Invalid amount: " + err.Error())
+	}
+
+	var token = Token{Amount: amount, Owner: args[2], Source: args[3], ConversionRate: conversion_rate}
 
 	tokenAsBytes, _ := json.Marshal(token)
 	APIstub.PutState(args[0], tokenAsBytes)
@@ -139,7 +142,7 @@ func (s *SmartContract) updateTokenVolume(APIstub shim.ChaincodeStubInterface, a
 		return shim.Error("Failed to unmarshal token: " + err.Error())
 	}
 
-	newVolume, err := strconv.Atoi(args[1])
+	newVolume, err := strconv.ParseFloat(args[1], 64)
 	if err != nil {
 		return shim.Error("Invalid volume: " + err.Error())
 	}
@@ -234,7 +237,6 @@ func (s *SmartContract) retireToken(APIstub shim.ChaincodeStubInterface, args []
 	return shim.Success(responsePayloadAsBytes)
 }
 
-
 func (s *SmartContract) queryToken(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 1 {
@@ -243,61 +245,6 @@ func (s *SmartContract) queryToken(APIstub shim.ChaincodeStubInterface, args []s
 
 	tokenAsBytes, _ := APIstub.GetState(args[0])
 	return shim.Success(tokenAsBytes)
-}
-
-func (s *SmartContract) queryTokensByOwner(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
-
-	if len(args) != 1 {
-		return shim.Error("Incorrect number of arguments")
-	}
-	owner := args[0]
-
-	ownerAndIdResultIterator, err := APIstub.GetStateByPartialCompositeKey("owner~key", []string{owner})
-	if err != nil {
-		return shim.Error(err.Error())
-	}
-
-	defer ownerAndIdResultIterator.Close()
-
-	var i int
-	var id string
-
-	var tokens []byte
-	bArrayMemberAlreadyWritten := false
-
-	tokens = append([]byte("["))
-
-	for i = 0; ownerAndIdResultIterator.HasNext(); i++ {
-		responseRange, err := ownerAndIdResultIterator.Next()
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-
-		objectType, compositeKeyParts, err := APIstub.SplitCompositeKey(responseRange.Key)
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-
-		id = compositeKeyParts[1]
-		assetAsBytes, err := APIstub.GetState(id)
-
-		if bArrayMemberAlreadyWritten == true {
-			newBytes := append([]byte(","), assetAsBytes...)
-			tokens = append(tokens, newBytes...)
-
-		} else {
-			// newBytes := append([]byte(","), tokensAsBytes...)
-			tokens = append(tokens, assetAsBytes...)
-		}
-
-		fmt.Printf("Found a asset for index : %s asset id : ", objectType, compositeKeyParts[0], compositeKeyParts[1])
-		bArrayMemberAlreadyWritten = true
-
-	}
-
-	tokens = append(tokens, []byte("]")...)
-
-	return shim.Success(tokens)
 }
 
 func (s *SmartContract) queryAllTokens(APIstub shim.ChaincodeStubInterface) sc.Response {

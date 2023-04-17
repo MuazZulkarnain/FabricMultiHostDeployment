@@ -28,6 +28,10 @@ services:
   couchdb2:
     container_name: couchdb2
     image: hyperledger/fabric-couchdb
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
     environment:
       - COUCHDB_USER=
       - COUCHDB_PASSWORD=
@@ -39,6 +43,10 @@ services:
   couchdb3:
     container_name: couchdb3
     image: hyperledger/fabric-couchdb
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
     environment:
       - COUCHDB_USER=
       - COUCHDB_PASSWORD=
@@ -49,6 +57,10 @@ services:
 
   peer0.org2.example.com:
     container_name: peer0.org2.example.com
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
     extends:
       file: base.yaml
       service: peer-base
@@ -91,6 +103,10 @@ services:
 
   peer1.org2.example.com:
     container_name: peer1.org2.example.com
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
     extends:
       file: base.yaml
       service: peer-base

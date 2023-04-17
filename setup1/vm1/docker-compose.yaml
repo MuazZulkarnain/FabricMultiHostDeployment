@@ -29,6 +29,10 @@ services:
   couchdb0:
     container_name: couchdb0
     image: hyperledger/fabric-couchdb
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
     environment:
       - COUCHDB_USER=
       - COUCHDB_PASSWORD=
@@ -40,6 +44,10 @@ services:
   couchdb1:
     container_name: couchdb1
     image: hyperledger/fabric-couchdb
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
     environment:
       - COUCHDB_USER=
       - COUCHDB_PASSWORD=
@@ -50,6 +58,10 @@ services:
 
   peer0.org1.example.com:
     container_name: peer0.org1.example.com
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
     extends:
       file: base.yaml
       service: peer-base
@@ -96,6 +108,10 @@ services:
 
   peer1.org1.example.com:
     container_name: peer1.org1.example.com
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
     extends:
       file: base.yaml
       service: peer-base
@@ -139,6 +155,10 @@ services:
   cli:
     container_name: cli
     image: hyperledger/fabric-tools
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
     tty: true
     environment:
       - GOPATH=/opt/gopath

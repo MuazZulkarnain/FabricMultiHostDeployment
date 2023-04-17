@@ -50,7 +50,7 @@ presetup() {
 
 CHANNEL_NAME="mychannel"
 CC_RUNTIME_LANGUAGE="golang"
-VERSION="1"
+VERSION="2"
 CC_SRC_PATH="./../../artifacts/src/github.com/prsb/go"
 CC_NAME="prsb"
 
@@ -160,7 +160,7 @@ chaincodeInvoke() {
         --peerAddresses localhost:7051 --tlsRootCertFiles $PEER0_ORG1_CA \
         --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA   \
         --peerAddresses localhost:11051 --tlsRootCertFiles $PEER0_ORG3_CA \
-        -c '{"function": "createToken","Args":["TOKEN00", "1.11", "PRSB-A", "PRSB-A"]}'
+        -c '{"function": "createToken","Args":["TOKEN00", 1.11, "PRSB-A", "PRSB-A", 0.6565]}'
 
     ## Init ledger
     peer chaincode invoke -o localhost:7050 \
@@ -196,10 +196,10 @@ chaincodeQuery() {
 # checkCommitReadyness
 # approveForMyOrg2
 # checkCommitReadyness
-commitChaincodeDefination
-queryCommitted
-chaincodeInvokeInit
-sleep 5
-chaincodeInvoke
-sleep 3
-chaincodeQuery
+# commitChaincodeDefination
+# queryCommitted
+# chaincodeInvokeInit
+# sleep 5
+# chaincodeInvoke
+# sleep 3
+# chaincodeQuery

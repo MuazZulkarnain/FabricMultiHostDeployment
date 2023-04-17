@@ -193,8 +193,8 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName', async function (req
         var channelName = req.params.channelName;
         var fcn = req.body.fcn;
         var args = req.body.args;
-        var transient = req.body.transient;
-        console.log(`Transient data is ;${transient}`)
+        // var transient = req.body.transient;
+        // console.log(`Transient data is ;${transient}`)
         logger.debug('channelName  : ' + channelName);
         logger.debug('chaincodeName : ' + chaincodeName);
         logger.debug('fcn  : ' + fcn);
@@ -216,7 +216,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName', async function (req
             return;
         }
 
-        let message = await invoke.invokeTransaction(channelName, chaincodeName, fcn, args, req.username, req.orgname, transient);
+        let message = await invoke.invokeTransaction(channelName, chaincodeName, fcn, args, req.username, req.orgname);
         console.log(`message result is : ${message}`)
 
         const response_payload = {
