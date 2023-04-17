@@ -49,7 +49,10 @@ const query = async (channelName, chaincodeName, args, fcn, username, org_name) 
             console.log(`arguments type is------------------------------------------------------------- ${typeof args}`)
             console.log(`length of args is------------------------------------------------------------ ${args.length}`)
             result = await contract.evaluateTransaction(fcn, args[0]);
-
+        } else if (fcn == 'queryTokenByTxID') {            
+            console.log(`arguments type is------------------------------------------------------------- ${typeof args}`)
+            console.log(`length of args is------------------------------------------------------------ ${args.length}`)
+            result = await contract.evaluateTransaction(fcn, args[0]);
         }
 
         console.log(result)

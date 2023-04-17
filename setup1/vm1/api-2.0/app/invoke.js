@@ -67,50 +67,85 @@ const invokeTransaction = async (channelName, chaincodeName, fcn, args, username
       
 
         if (fcn === "generateToken") {
-          if (tokenExist.toString() === "true") {
+          if (tokenExist.toString()) {
               result = await contract.submitTransaction("updateTokenVolume", tokenId, args[1]);
               result = JSON.parse(result.toString());
-              message = `Successfully updated token volume with key ${tokenId}`;
+              message = `Successfully generated ${args[1]} tokens for ${tokenId}!`;
           } else {
               result = await contract.submitTransaction("createToken", tokenId, args[1], args[2], args[3], args[4]);
               result = JSON.parse(result.toString());
-              message = `Successfully added the token asset with key ${tokenId}`;
+              message = `Successfully generated ${args[1]} tokens for ${tokenId}!`;
           }
         } else if (fcn === "transferToken") {
-          //assign variables
-          let currentOwner = args[0]
-          let newOwner = args[1]
-          let amount = args[2]
+            // assign variables
+            let currentOwner = args[0];
+            let newOwner = args[1];
+            let amount = parseFloat(args[2]);
+          
+            // Check if token exists
+            tokenExist = await contract.evaluateTransaction("queryToken", currentOwner);
+            if (tokenExist.toString()) {
+            } else {
+              return `Token with key ${currentOwner} does not exist`;
+            }
 
-          // Check if token exists
-          // tokenExist = await contract.evaluateTransaction("queryToken", currentOwner);
-          // if (tokenExist.toString() !== "true") {
-          //   return `Token with key ${tokenId} does not exist`;
-          // }
+            let currentOwnerToken = JSON.parse(tokenExist.toString());
+            let currentOwnerAmount = currentOwnerToken.amount;
 
-          // Transfer the tokens
-          result = await contract.submitTransaction("updateTokenVolume", currentOwner, --amount);
-          result = await contract.submitTransaction("updateTokenVolume", newOwner, ++amount);
-          result = JSON.parse(result.toString());
-          message = `Successfully transferred ${amount} tokens to ${newOwner}`;
+            tokenExist = await contract.evaluateTransaction("queryToken", newOwner);
+            if (tokenExist.toString()) {
+            } else {
+              return `Token with key ${newOwner} does not exist`;
+            }
+          
+            let newOwnerToken = JSON.parse(tokenExist.toString());
+            let newOwnerAmount = newOwnerToken.amount;
+
+            if (currentOwnerAmount < amount ) {
+              return `${currentOwner} do not have enough tokens for the transfer!`;
+            }
+
+            // Transfer the tokens
+            result = await contract.submitTransaction("updateTokenVolume", currentOwner, currentOwnerAmount - amount);
+            result = await contract.submitTransaction("updateTokenVolume", newOwner, newOwnerAmount + amount);
+            result = JSON.parse(result.toString());
+            message = `Successfully transferred ${amount} tokens to ${newOwner}`;
         } else if (fcn === "createToken") {
             result = await contract.submitTransaction(fcn, args[0], args[1], args[2], args[3], args[4]);
             result = JSON.parse(result.toString());
             message = `Successfully added the token asset with key ${args[0]}`
+
         } else if (fcn === "changeTokenOwner") {
             result = await contract.submitTransaction(fcn, args[0], args[1]);
             result = JSON.parse(result.toString());
             message = `Successfully changed token owner with key ${args[0]}`
+
         } else if (fcn === "updateTokenVolume") {
             result = await contract.submitTransaction(fcn, args[0], args[1]);
             result = JSON.parse(result.toString());
             message = `Successfully updated token volume with key ${args[0]}`
+
         } else if (fcn === "retireToken") {
             result = await contract.submitTransaction(fcn, args[0]);
             result = JSON.parse(result.toString());
             message = `Successfully retired token with key ${args[0]}`
+
+        } else if (fcn === "retirePartialToken") {
+            tokenExist = await contract.evaluateTransaction("queryToken", tokenId);
+            if (tokenExist.toString()) {
+            } else {
+              return `Token with key ${tokenId} does not exist`;
+            }
+
+            let amount = parseFloat(args[1]);
+            let currentToken = JSON.parse(tokenExist.toString());
+            let currentAmount = currentToken.amount;
+            result = await contract.submitTransaction("updateTokenVolume", tokenId, currentAmount - amount);
+            result = JSON.parse(result.toString());
+            message = `Successfully retired ${amount} tokens!`
+
         } else {
-            return `Invocation requires either createToken or changeTokenOwner as function but got ${fcn}`
+            return `Invocation requires either generateToken/transferToken/createToken/changeTokenOwner/updateTokenVolume/retireToken/retirePartialToken as function but got ${fcn}`
         }
 
         await gateway.disconnect();

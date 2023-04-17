@@ -41,6 +41,8 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 	switch function {
 	case "queryToken":
 		return s.queryToken(APIstub, args)
+	case "queryTokenByTxID":
+		return s.queryTokenByTxID(APIstub, args)
 	case "initLedger":
 		return s.initLedger(APIstub)
 	case "createToken":
@@ -82,32 +84,58 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 
 func (s *SmartContract) createToken(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
+	// Check the number of arguments
 	if len(args) != 5 {
-		return shim.Error("Incorrect number of arguments. Expecting 4")
+		return shim.Error("Incorrect number of arguments. Expecting 5")
 	}
 
+	// Parse the amount argument
 	amount, err := strconv.ParseFloat(args[1], 64)
 	if err != nil {
 		return shim.Error("Invalid amount: " + err.Error())
 	}
 
+	// Parse the conversion rate argument
 	conversion_rate, err := strconv.ParseFloat(args[4], 64)
 	if err != nil {
-		return shim.Error("Invalid amount: " + err.Error())
+		return shim.Error("Invalid conversion rate: " + err.Error())
 	}
 
+	// Check if the asset already exists
+	tokenAsBytes, err := APIstub.GetState(args[0])
+	if err != nil {
+		return shim.Error("Failed to get asset: " + err.Error())
+	} else if tokenAsBytes != nil {
+		return shim.Error("Asset already exists: " + args[0])
+	}
+
+	// Create the token object
 	var token = Token{Amount: amount, Owner: args[2], Source: args[3], ConversionRate: conversion_rate}
 
-	tokenAsBytes, _ := json.Marshal(token)
-	APIstub.PutState(args[0], tokenAsBytes)
+	// Marshal the token object to bytes
+	tokenAsBytes, err = json.Marshal(token)
+	if err != nil {
+		return shim.Error("Failed to marshal token: " + err.Error())
+	}
 
+	// Put the token in the ledger
+	err = APIstub.PutState(args[0], tokenAsBytes)
+	if err != nil {
+		return shim.Error("Failed to put asset: " + err.Error())
+	}
+
+	// Create the composite key for the owner
 	indexName := "owner~key"
 	colorNameIndexKey, err := APIstub.CreateCompositeKey(indexName, []string{token.Owner, args[0]})
 	if err != nil {
-		return shim.Error(err.Error())
+		return shim.Error("Failed to create composite key: " + err.Error())
 	}
-	value := []byte{0x00}
-	APIstub.PutState(colorNameIndexKey, value)
+
+	// Put the index in the ledger
+	err = APIstub.PutState(colorNameIndexKey, []byte{0x00})
+	if err != nil {
+		return shim.Error("Failed to put index: " + err.Error())
+	}
 
 	// Get the transaction ID (txID)
 	txID := APIstub.GetTxID()
@@ -121,8 +149,12 @@ func (s *SmartContract) createToken(APIstub shim.ChaincodeStubInterface, args []
 		TxID:  txID,
 	}
 
-	responsePayloadAsBytes, _ := json.Marshal(responsePayload)
+	responsePayloadAsBytes, err := json.Marshal(responsePayload)
+	if err != nil {
+		return shim.Error("Failed to marshal response payload: " + err.Error())
+	}
 
+	// Return the response payload as success response
 	return shim.Success(responsePayloadAsBytes)
 }
 
@@ -242,6 +274,20 @@ func (s *SmartContract) queryToken(APIstub shim.ChaincodeStubInterface, args []s
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
 	}
+
+	tokenAsBytes, _ := APIstub.GetState(args[0])
+	return shim.Success(tokenAsBytes)
+}
+
+func (s *SmartContract) queryTokenByTxID(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 1 {
+		return shim.Error("Incorrect number of arguments. Expecting 1")
+	}
+
+	// Get the transaction ID (txID)
+	txID := APIstub.GetTxID()
+	args[0] = txID
 
 	tokenAsBytes, _ := APIstub.GetState(args[0])
 	return shim.Success(tokenAsBytes)
