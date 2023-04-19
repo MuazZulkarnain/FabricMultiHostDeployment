@@ -200,19 +200,19 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName', async function (req
         logger.debug('fcn  : ' + fcn);
         logger.debug('args  : ' + args);
         if (!chaincodeName) {
-            res.json(getErrorMessage('\'chaincodeName\''));
+            res.status(400).json({errorCode: 'CHAINCODE_NAME_MISSING', message: 'Chaincode name is missing'});
             return;
         }
         if (!channelName) {
-            res.json(getErrorMessage('\'channelName\''));
+            res.status(400).json({errorCode: 'CHANNEL_NAME_MISSING', message: 'Channel name is missing'});
             return;
         }
         if (!fcn) {
-            res.json(getErrorMessage('\'fcn\''));
+            res.status(400).json({errorCode: 'FUNCTION_NAME_MISSING', message: 'Function name is missing'});
             return;
         }
         if (!args) {
-            res.json(getErrorMessage('\'args\''));
+            res.status(400).json({errorCode: 'ARGS_MISSING', message: 'Arguments are missing'});
             return;
         }
 
@@ -232,9 +232,14 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName', async function (req
             error: error.name,
             errorData: error.message
         }
-        res.send(response_payload)
+        if (error.name === 'Error' && error.message.includes('chaincode is not installed')) {
+            res.status(99).json({errorCode: 'Connection with peer nodes unsuccessful', message: 'Please try to the post request again'});
+        } else {
+            res.status(500).json({errorCode: 'UNKNOWN_ERROR', message: 'Unknown error'});
+        }
     }
 });
+
 
 app.get('/channels/:channelName/chaincodes/:chaincodeName', async function (req, res) {
     try {
@@ -253,19 +258,19 @@ app.get('/channels/:channelName/chaincodes/:chaincodeName', async function (req,
         logger.debug('args : ' + args);
 
         if (!chaincodeName) {
-            res.json(getErrorMessage('\'chaincodeName\''));
+            res.status(400).send({ errorCode: 'ERR_CHAINCODE_NAME_MISSING', message: '\'chaincodeName\' is missing.' });
             return;
         }
         if (!channelName) {
-            res.json(getErrorMessage('\'channelName\''));
+            res.status(400).send({ errorCode: 'ERR_CHANNEL_NAME_MISSING', message: '\'channelName\' is missing.' });
             return;
         }
         if (!fcn) {
-            res.json(getErrorMessage('\'fcn\''));
+            res.status(400).send({ errorCode: 'ERR_FUNCTION_NAME_MISSING', message: '\'fcn\' is missing.' });
             return;
         }
         if (!args) {
-            res.json(getErrorMessage('\'args\''));
+            res.status(400).send({ errorCode: 'ERR_ARGS_MISSING', message: '\'args\' is missing.' });
             return;
         }
         console.log('args==========', args);
@@ -283,14 +288,18 @@ app.get('/channels/:channelName/chaincodes/:chaincodeName', async function (req,
 
         res.send(response_payload);
     } catch (error) {
-        const response_payload = {
-            result: null,
-            error: error.name,
-            errorData: error.message
+        let errorCode = 'ERR_QUERY_FAILED';
+        let message = error.message;
+
+        if (error.name === 'TypeError') {
+            errorCode = 'ERR_ARGS_INVALID';
+            message = '\'args\' is invalid JSON format.';
         }
-        res.send(response_payload)
+
+        res.status(500).send({ errorCode: errorCode, message: message });
     }
 });
+
 
 app.get('/qscc/channels/:channelName/chaincodes/:chaincodeName', async function (req, res) {
     try {
