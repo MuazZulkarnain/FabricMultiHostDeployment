@@ -193,30 +193,30 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName', async function (req
         var channelName = req.params.channelName;
         var fcn = req.body.fcn;
         var args = req.body.args;
-        // var transient = req.body.transient;
-        // console.log(`Transient data is ;${transient}`)
+        var transient = req.body.transient;
+        console.log(`Transient data is ;${transient}`)
         logger.debug('channelName  : ' + channelName);
         logger.debug('chaincodeName : ' + chaincodeName);
         logger.debug('fcn  : ' + fcn);
         logger.debug('args  : ' + args);
         if (!chaincodeName) {
-            res.status(400).json({errorCode: 'CHAINCODE_NAME_MISSING', message: 'Chaincode name is missing'});
+            res.json(getErrorMessage('\'chaincodeName\''));
             return;
         }
         if (!channelName) {
-            res.status(400).json({errorCode: 'CHANNEL_NAME_MISSING', message: 'Channel name is missing'});
+            res.json(getErrorMessage('\'channelName\''));
             return;
         }
         if (!fcn) {
-            res.status(400).json({errorCode: 'FUNCTION_NAME_MISSING', message: 'Function name is missing'});
+            res.json(getErrorMessage('\'fcn\''));
             return;
         }
         if (!args) {
-            res.status(400).json({errorCode: 'ARGS_MISSING', message: 'Arguments are missing'});
+            res.json(getErrorMessage('\'args\''));
             return;
         }
 
-        let message = await invoke.invokeTransaction(channelName, chaincodeName, fcn, args, req.username, req.orgname);
+        let message = await invoke.invokeTransaction(channelName, chaincodeName, fcn, args, req.username, req.orgname, transient);
         console.log(`message result is : ${message}`)
 
         const response_payload = {
@@ -232,14 +232,9 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName', async function (req
             error: error.name,
             errorData: error.message
         }
-        if (error.name === 'Error' && error.message.includes('chaincode is not installed')) {
-            res.status(99).json({errorCode: 'Connection with peer nodes unsuccessful', message: 'Please try to the post request again'});
-        } else {
-            res.status(500).json({errorCode: 'UNKNOWN_ERROR', message: 'Unknown error'});
-        }
+        res.send(response_payload)
     }
 });
-
 
 app.get('/channels/:channelName/chaincodes/:chaincodeName', async function (req, res) {
     try {
@@ -258,19 +253,19 @@ app.get('/channels/:channelName/chaincodes/:chaincodeName', async function (req,
         logger.debug('args : ' + args);
 
         if (!chaincodeName) {
-            res.status(400).send({ errorCode: 'ERR_CHAINCODE_NAME_MISSING', message: '\'chaincodeName\' is missing.' });
+            res.json(getErrorMessage('\'chaincodeName\''));
             return;
         }
         if (!channelName) {
-            res.status(400).send({ errorCode: 'ERR_CHANNEL_NAME_MISSING', message: '\'channelName\' is missing.' });
+            res.json(getErrorMessage('\'channelName\''));
             return;
         }
         if (!fcn) {
-            res.status(400).send({ errorCode: 'ERR_FUNCTION_NAME_MISSING', message: '\'fcn\' is missing.' });
+            res.json(getErrorMessage('\'fcn\''));
             return;
         }
         if (!args) {
-            res.status(400).send({ errorCode: 'ERR_ARGS_MISSING', message: '\'args\' is missing.' });
+            res.json(getErrorMessage('\'args\''));
             return;
         }
         console.log('args==========', args);
@@ -288,18 +283,14 @@ app.get('/channels/:channelName/chaincodes/:chaincodeName', async function (req,
 
         res.send(response_payload);
     } catch (error) {
-        let errorCode = 'ERR_QUERY_FAILED';
-        let message = error.message;
-
-        if (error.name === 'TypeError') {
-            errorCode = 'ERR_ARGS_INVALID';
-            message = '\'args\' is invalid JSON format.';
+        const response_payload = {
+            result: null,
+            error: error.name,
+            errorData: error.message
         }
-
-        res.status(500).send({ errorCode: errorCode, message: message });
+        res.send(response_payload)
     }
 });
-
 
 app.get('/qscc/channels/:channelName/chaincodes/:chaincodeName', async function (req, res) {
     try {

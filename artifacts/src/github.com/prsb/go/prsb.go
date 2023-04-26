@@ -280,17 +280,47 @@ func (s *SmartContract) queryToken(APIstub shim.ChaincodeStubInterface, args []s
 }
 
 func (s *SmartContract) queryTokenByTxID(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
-
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
 	}
 
-	// Get the transaction ID (txID)
-	txID := APIstub.GetTxID()
-	args[0] = txID
+	// Get the transaction ID from the arguments
+	txID := args[0]
 
-	tokenAsBytes, _ := APIstub.GetState(args[0])
-	return shim.Success(tokenAsBytes)
+	// Get all the keys that match the query pattern "txID~*"
+	resultsIterator, err := APIstub.GetStateByPartialCompositeKey("txID~", []string{txID})
+	if err != nil {
+		return shim.Error("Failed to get tokens by txID: " + err.Error())
+	}
+	defer resultsIterator.Close()
+
+	// Iterate through the keys and return the first match
+	for resultsIterator.HasNext() {
+		// Get the next key-value pair
+		queryResponse, err := resultsIterator.Next()
+		if err != nil {
+			return shim.Error("Failed to get next key-value pair: " + err.Error())
+		}
+
+		// Get the token object from the value bytes
+		var token Token
+		err = json.Unmarshal(queryResponse.Value, &token)
+		if err != nil {
+			return shim.Error("Failed to unmarshal token: " + err.Error())
+		}
+
+		// Return the token if it matches the query transaction ID
+		if token.TxID == txID {
+			responsePayloadAsBytes, err := json.Marshal(token)
+			if err != nil {
+				return shim.Error("Failed to marshal token: " + err.Error())
+			}
+			return shim.Success(responsePayloadAsBytes)
+		}
+	}
+
+	// Return an error if no matching token was found
+	return shim.Error("Token not found with txID: " + txID)
 }
 
 func (s *SmartContract) queryAllTokens(APIstub shim.ChaincodeStubInterface) sc.Response {

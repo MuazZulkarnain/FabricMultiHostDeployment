@@ -50,7 +50,7 @@ presetup() {
 
 CHANNEL_NAME="mychannel"
 CC_RUNTIME_LANGUAGE="golang"
-VERSION="6"
+VERSION="8"
 CC_SRC_PATH="./../../artifacts/src/github.com/prsb/go"
 CC_NAME="prsb"
 
@@ -179,8 +179,10 @@ chaincodeInvoke() {
 chaincodeQuery() {
     setGlobalsForPeer0Org1
 
-    # Query Car by Id
-    peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "queryToken","Args":["TOKEN0"]}'
+    # Query Token by Id
+    peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "queryToken","Args":["TOKEN1"]}'
+
+    peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "queryTokenByTxID","Args":["056765a1fa9d786bdd14e69bed01f5afcaf4fa7de47115d2f9524de003160d15"]}'
  
 }
 
