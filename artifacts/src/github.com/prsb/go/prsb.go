@@ -23,6 +23,7 @@ type Token struct {
 	Owner          string  `json:"owner"`
 	Source         string  `json:"source"`
 	ConversionRate float64 `json:"conversion_rate"`
+	PastOperation  string  `json:"past_operation"`
 }
 
 // Init ;  Method for initializing smart contract
@@ -88,8 +89,8 @@ func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) sc.Respo
 func (s *SmartContract) createToken(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	// Check the number of arguments
-	if len(args) != 5 {
-		return shim.Error("Incorrect number of arguments. Expecting 5")
+	if len(args) != 6 {
+		return shim.Error("Incorrect number of arguments. Expecting 6")
 	}
 
 	// Parse the amount argument
@@ -113,7 +114,7 @@ func (s *SmartContract) createToken(APIstub shim.ChaincodeStubInterface, args []
 	}
 
 	// Create the token object
-	var token = Token{Amount: amount, Owner: args[2], Source: args[3], ConversionRate: conversion_rate}
+	var token = Token{Amount: amount, Owner: args[2], Source: args[3], ConversionRate: conversion_rate, PastOperation: args[6]}
 
 	// Marshal the token object to bytes
 	tokenAsBytes, err = json.Marshal(token)
