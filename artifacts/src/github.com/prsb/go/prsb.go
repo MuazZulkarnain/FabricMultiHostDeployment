@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+
 	"time"
 
 	"github.com/hyperledger/fabric-chaincode-go/shim"
@@ -55,8 +56,10 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response 
 		return s.retireToken(APIstub, args)
 	case "queryAllTokens":
 		return s.queryAllTokens(APIstub)
-	case "getHistoryForAsset":
-		return s.getHistoryForAsset(APIstub, args)
+	case "queryTokenHistory":
+		return s.queryTokenHistory(APIstub, args)
+	case "queryTokenHistoryByTxID":
+		return s.queryTokenHistoryByTxID(APIstub, args)
 	default:
 		return shim.Error("Invalid Smart Contract function name.")
 	}
@@ -284,42 +287,51 @@ func (s *SmartContract) queryTokenByTxID(APIstub shim.ChaincodeStubInterface, ar
 		return shim.Error("Incorrect number of arguments. Expecting 1")
 	}
 
-	// Get the transaction ID from the arguments
 	txID := args[0]
 
-	// Get all the keys that match the query pattern "txID~*"
-	resultsIterator, err := APIstub.GetStateByPartialCompositeKey("txID~", []string{txID})
+	// Get the history of all transactions with the given txID as the key
+	resultsIterator, err := APIstub.GetHistoryForKey(txID)
 	if err != nil {
-		return shim.Error("Failed to get tokens by txID: " + err.Error())
+		return shim.Error("Failed to get transaction history: " + err.Error())
 	}
 	defer resultsIterator.Close()
 
-	// Iterate through the keys and return the first match
+	// Iterate through the transaction history and look for the token with the given txID
 	for resultsIterator.HasNext() {
-		// Get the next key-value pair
 		queryResponse, err := resultsIterator.Next()
 		if err != nil {
-			return shim.Error("Failed to get next key-value pair: " + err.Error())
+			return shim.Error("Failed to get next transaction: " + err.Error())
 		}
 
-		// Get the token object from the value bytes
+		// Unmarshal the transaction value to a Token object
 		var token Token
 		err = json.Unmarshal(queryResponse.Value, &token)
 		if err != nil {
-			return shim.Error("Failed to unmarshal token: " + err.Error())
+			return shim.Error("Failed to unmarshal transaction value to Token: " + err.Error())
 		}
 
-		// Return the token if it matches the query transaction ID
-		if token.TxID == txID {
-			responsePayloadAsBytes, err := json.Marshal(token)
-			if err != nil {
-				return shim.Error("Failed to marshal token: " + err.Error())
+		// Check if the token has the given txID
+		if queryResponse.TxId == txID {
+			// Build the response payload
+			responsePayload := struct {
+				Token Token  `json:"token"`
+				TxID  string `json:"txID"`
+			}{
+				Token: token,
+				TxID:  queryResponse.TxId,
 			}
+
+			responsePayloadAsBytes, err := json.Marshal(responsePayload)
+			if err != nil {
+				return shim.Error("Failed to marshal response payload: " + err.Error())
+			}
+
+			// Return the response payload as success response
 			return shim.Success(responsePayloadAsBytes)
 		}
 	}
 
-	// Return an error if no matching token was found
+	// If the function has not yet returned, then the token was not found with the given txID
 	return shim.Error("Token not found with txID: " + txID)
 }
 
@@ -366,7 +378,7 @@ func (s *SmartContract) queryAllTokens(APIstub shim.ChaincodeStubInterface) sc.R
 	return shim.Success(buffer.Bytes())
 }
 
-func (t *SmartContract) getHistoryForAsset(stub shim.ChaincodeStubInterface, args []string) sc.Response {
+func (t *SmartContract) queryTokenHistory(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) < 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
@@ -427,6 +439,48 @@ func (t *SmartContract) getHistoryForAsset(stub shim.ChaincodeStubInterface, arg
 	fmt.Printf("- getHistoryForAsset returning:\n%s\n", buffer.String())
 
 	return shim.Success(buffer.Bytes())
+}
+
+func (s *SmartContract) queryTokenHistoryByTxID(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+	// Check the number of arguments
+	if len(args) != 1 {
+		return shim.Error("Incorrect number of arguments. Expecting 1")
+	}
+
+	// Get the history iterator
+	resultsIterator, err := APIstub.GetHistoryForKey(args[0])
+	if err != nil {
+		return shim.Error("Failed to get history for asset: " + err.Error())
+	}
+	defer resultsIterator.Close()
+
+	// Convert the history to a slice of Token objects
+	var history []Token
+	for resultsIterator.HasNext() {
+		response, err := resultsIterator.Next()
+		if err != nil {
+			return shim.Error("Failed to get next history entry: " + err.Error())
+		}
+
+		// Unmarshal the transaction value to a Token object
+		var token Token
+		err = json.Unmarshal(response.Value, &token)
+		if err != nil {
+			return shim.Error("Failed to unmarshal transaction value: " + err.Error())
+		}
+
+		// Add the Token object to the history slice
+		history = append(history, token)
+	}
+
+	// Convert the history slice to JSON bytes
+	historyAsBytes, err := json.Marshal(history)
+	if err != nil {
+		return shim.Error("Failed to marshal history: " + err.Error())
+	}
+
+	// Return the history as a success response
+	return shim.Success(historyAsBytes)
 }
 
 // The main function is only relevant in unit test mode. Only included here for completeness.

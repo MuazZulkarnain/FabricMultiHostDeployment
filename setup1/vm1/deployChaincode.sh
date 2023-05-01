@@ -50,7 +50,7 @@ presetup() {
 
 CHANNEL_NAME="mychannel"
 CC_RUNTIME_LANGUAGE="golang"
-VERSION="8"
+VERSION="5"
 CC_SRC_PATH="./../../artifacts/src/github.com/prsb/go"
 CC_NAME="prsb"
 
@@ -180,10 +180,12 @@ chaincodeQuery() {
     setGlobalsForPeer0Org1
 
     # Query Token by Id
-    peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "queryToken","Args":["TOKEN1"]}'
+    # peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "queryToken","Args":["TOKEN1"]}'
 
-    peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "queryTokenByTxID","Args":["056765a1fa9d786bdd14e69bed01f5afcaf4fa7de47115d2f9524de003160d15"]}'
- 
+    # peer chaincode query -C $CHANNEL_NAME -n ${CC_NAME} -c '{"function": "queryTokenByTxID","Args":["056765a1fa9d786bdd14e69bed01f5afcaf4fa7de47115d2f9524de003160d15"]}'
+    peer chaincode query -n prsb -c '{"Args":["queryTokenHistoryByTxID", "1bcc4387fcfe66209c7ef3da680a736bc8f8c625615328d0454e42c7b7961b71"]}' -C mychannel
+
+
 }
 
 # chaincodeQuery
@@ -198,10 +200,10 @@ chaincodeQuery() {
 # checkCommitReadyness
 # approveForMyOrg2
 # checkCommitReadyness
-commitChaincodeDefination
-queryCommitted
-chaincodeInvokeInit
+# commitChaincodeDefination
+# queryCommitted
+# chaincodeInvokeInit
 # sleep 5
 # chaincodeInvoke
 # sleep 3
-# chaincodeQuery
+chaincodeQuery

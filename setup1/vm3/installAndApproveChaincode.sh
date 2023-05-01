@@ -33,7 +33,7 @@ presetup() {
 
 CHANNEL_NAME="mychannel"
 CC_RUNTIME_LANGUAGE="golang"
-VERSION="8"
+VERSION="5"
 CC_SRC_PATH="./../../artifacts/src/github.com/prsb/go"
 CC_NAME="prsb"
 
