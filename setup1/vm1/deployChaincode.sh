@@ -50,7 +50,7 @@ presetup() {
 
 CHANNEL_NAME="mychannel"
 CC_RUNTIME_LANGUAGE="golang"
-VERSION="5"
+VERSION="6"
 CC_SRC_PATH="./../../artifacts/src/github.com/prsb/go"
 CC_NAME="prsb"
 
@@ -200,10 +200,10 @@ chaincodeQuery() {
 # checkCommitReadyness
 # approveForMyOrg2
 # checkCommitReadyness
-# commitChaincodeDefination
-# queryCommitted
-# chaincodeInvokeInit
+commitChaincodeDefination
+queryCommitted
+chaincodeInvokeInit
 # sleep 5
 # chaincodeInvoke
 # sleep 3
-chaincodeQuery
+# chaincodeQuery

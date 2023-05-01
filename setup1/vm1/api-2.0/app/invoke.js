@@ -68,9 +68,23 @@ const invokeTransaction = async (channelName, chaincodeName, fcn, args, username
 
         if (fcn === "generateToken") {
           if (tokenExist.toString()) {
-              result = await contract.submitTransaction("updateTokenVolume", tokenId, args[1]);
-              result = JSON.parse(result.toString());
-              message = `Successfully generated ${args[1]} tokens for ${tokenId}!`;
+              // assign variables
+            let currentOwner = args[0];
+            let amount = parseFloat(args[1]);
+          
+            // Check if token exists
+            tokenExist = await contract.evaluateTransaction("queryToken", currentOwner);
+            if (tokenExist.toString()) {
+            } else {
+              return `Token with key ${currentOwner} does not exist`;
+            }
+
+            let currentOwnerToken = JSON.parse(tokenExist.toString());
+            let currentOwnerAmount = currentOwnerToken.amount;
+
+            result = await contract.submitTransaction("updateTokenVolume", currentOwner, currentOwnerAmount + amount);
+            result = JSON.parse(result.toString());
+            message = `Successfully generated ${args[1]} tokens for ${currentOwner}!`;
           } else {
               result = await contract.submitTransaction("createToken", tokenId, args[1], args[2], args[3], args[4]);
               result = JSON.parse(result.toString());
