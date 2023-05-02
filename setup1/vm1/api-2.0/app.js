@@ -224,7 +224,18 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName', async function (req
             error: null,
             errorData: null
         }
-        res.send(response_payload);
+
+        const errorMessage = response_payload.result;
+
+        if (errorMessage == "make sure the chaincode prsb has been successfully defined on channel mychannel and try again: chaincode definition for 'prsb' exists, but chaincode is not installed") {
+            return res.status(502).json({ error: "Please Re-trigger the request"})
+        } else if (errorMessage == "Unexpected end of JSON input") {
+            return res.status(400).json({ error: "Incorrect token id. Please check the parameters"})
+        } else if (errorMessage == "Cannot read property 'toString' of undefined"){
+            return res.status(400).json({ error: "Incorrect function name. Please check the parameters"})
+        } else {
+            return res.status(201).send(response_payload);
+        }
 
     } catch (error) {
         const response_payload = {
@@ -232,7 +243,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName', async function (req
             error: error.name,
             errorData: error.message
         }
-        res.send(response_payload)
+        return res.status(400).send(response_payload)
     }
 });
 
@@ -282,10 +293,15 @@ app.get('/channels/:channelName/chaincodes/:chaincodeName', async function (req,
         }
 
         const errorMessage = response_payload.result;
-        if (errorMessage.includes("make sure the chaincode prsb")) {
-            res.status(99).json({ error: "Please Re-trigger the request"})
+
+        if (errorMessage == "make sure the chaincode prsb has been successfully defined on channel mychannel and try again: chaincode definition for 'prsb' exists, but chaincode is not installed") {
+            return res.status(502).json({ error: "Please Re-trigger the request"})
+        } else if (errorMessage == "Unexpected end of JSON input") {
+            return res.status(400).json({ error: "Incorrect token id. Please check the parameters"})
+        } else if (errorMessage == "Cannot read property 'toString' of undefined"){
+            return res.status(400).json({ error: "Incorrect function name. Please check the parameters"})
         } else {
-            res.status(20).send(response_payload);
+            return res.status(200).send(response_payload);
         }
     } catch (error) {
         const response_payload = {
@@ -293,7 +309,7 @@ app.get('/channels/:channelName/chaincodes/:chaincodeName', async function (req,
             error: error.name,
             errorData: error.message
         }
-        res.send(response_payload)
+        return res.status(400).send(response_payload)
     }
 });
 
