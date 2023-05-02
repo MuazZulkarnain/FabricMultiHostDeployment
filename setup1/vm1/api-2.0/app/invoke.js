@@ -82,11 +82,11 @@ const invokeTransaction = async (channelName, chaincodeName, fcn, args, username
             let currentOwnerToken = JSON.parse(tokenExist.toString());
             let currentOwnerAmount = currentOwnerToken.amount;
 
-            result = await contract.submitTransaction("updateTokenVolume", currentOwner, currentOwnerAmount + amount);
+            result = await contract.submitTransaction("updateTokenVolume", currentOwner, currentOwnerAmount + amount, "Token Generated");
             result = JSON.parse(result.toString());
             message = `Successfully generated ${args[1]} tokens for ${currentOwner}!`;
           } else {
-              result = await contract.submitTransaction("createToken", tokenId, args[1], args[2], args[3], args[4]);
+              result = await contract.submitTransaction("createToken", tokenId, args[1], args[2], args[3], args[4], "Token Generated");
               result = JSON.parse(result.toString());
               message = `Successfully generated ${args[1]} tokens for ${tokenId}!`;
           }
@@ -120,8 +120,8 @@ const invokeTransaction = async (channelName, chaincodeName, fcn, args, username
             }
 
             // Transfer the tokens
-            result = await contract.submitTransaction("updateTokenVolume", currentOwner, currentOwnerAmount - amount);
-            result = await contract.submitTransaction("updateTokenVolume", newOwner, newOwnerAmount + amount);
+            result = await contract.submitTransaction("updateTokenVolume", currentOwner, currentOwnerAmount - amount, "Token Transferred");
+            result = await contract.submitTransaction("updateTokenVolume", newOwner, newOwnerAmount + amount, "Token Transferred");
             result = JSON.parse(result.toString());
             message = `Successfully transferred ${amount} tokens to ${newOwner}`;
         } else if (fcn === "createToken") {
@@ -154,7 +154,7 @@ const invokeTransaction = async (channelName, chaincodeName, fcn, args, username
             let amount = parseFloat(args[1]);
             let currentToken = JSON.parse(tokenExist.toString());
             let currentAmount = currentToken.amount;
-            result = await contract.submitTransaction("updateTokenVolume", tokenId, currentAmount - amount);
+            result = await contract.submitTransaction("updateTokenVolume", tokenId, currentAmount - amount, "Token Retired");
             result = JSON.parse(result.toString());
             message = `Successfully retired ${amount} tokens!`
 

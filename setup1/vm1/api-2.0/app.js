@@ -281,7 +281,12 @@ app.get('/channels/:channelName/chaincodes/:chaincodeName', async function (req,
             errorData: null
         }
 
-        res.send(response_payload);
+        const errorMessage = response_payload.result;
+        if (errorMessage.includes("make sure the chaincode prsb")) {
+            res.status(99).json({ error: "Please Re-trigger the request"})
+        } else {
+            res.status(20).send(response_payload);
+        }
     } catch (error) {
         const response_payload = {
             result: null,
@@ -337,6 +342,7 @@ app.get('/qscc/channels/:channelName/chaincodes/:chaincodeName', async function 
         //     errorData: null
         // }
 
+        
         res.send(response_payload);
     } catch (error) {
         const response_payload = {

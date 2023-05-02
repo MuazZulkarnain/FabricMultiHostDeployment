@@ -114,7 +114,7 @@ func (s *SmartContract) createToken(APIstub shim.ChaincodeStubInterface, args []
 	}
 
 	// Create the token object
-	var token = Token{Amount: amount, Owner: args[2], Source: args[3], ConversionRate: conversion_rate, PastOperation: args[6]}
+	var token = Token{Amount: amount, Owner: args[2], Source: args[3], ConversionRate: conversion_rate, PastOperation: args[5]}
 
 	// Marshal the token object to bytes
 	tokenAsBytes, err = json.Marshal(token)
@@ -163,8 +163,8 @@ func (s *SmartContract) createToken(APIstub shim.ChaincodeStubInterface, args []
 }
 
 func (s *SmartContract) updateTokenVolume(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
-	if len(args) != 2 {
-		return shim.Error("Incorrect number of arguments. Expecting 2")
+	if len(args) != 3 {
+		return shim.Error("Incorrect number of arguments. Expecting 3")
 	}
 
 	tokenAsBytes, err := APIstub.GetState(args[0])
@@ -183,6 +183,7 @@ func (s *SmartContract) updateTokenVolume(APIstub shim.ChaincodeStubInterface, a
 		return shim.Error("Invalid volume: " + err.Error())
 	}
 
+	token.PastOperation = args[2]
 	token.Amount = newVolume
 	tokenAsBytes, err = json.Marshal(token)
 	if err != nil {

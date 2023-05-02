@@ -1,7 +1,10 @@
 Installed chaincodes on peer:
-Package ID: prsb_1:8b457b7f662b04f90364110a59a599cf9e0a005255287edacb678574f7c8de14, Label: prsb_1
-Package ID: prsb_2:66a3be811f220db8615c7a4ef8e36111acaa392b1784e32e5126790e4d333295, Label: prsb_2
-Package ID: prsb_3:33942508f72c899e389eed468a24d3a50d8ebd305bc129894056c3adf2cc137c, Label: prsb_3
-Package ID: prsb_4:8192ca175709aabbea6a2ee51492bc97624aaf72e86e9646da94de4dc217047e, Label: prsb_4
 Package ID: prsb_5:23247eb1c862f38dfb8f74a73767d97137d3bf23aa0dbc251de67f8611d3b608, Label: prsb_5
 Package ID: prsb_6:e13b0183097a18b2b4df36aa31de0b14d8654d416962363d163120ea9f64d6b8, Label: prsb_6
+Package ID: prsb_3:33942508f72c899e389eed468a24d3a50d8ebd305bc129894056c3adf2cc137c, Label: prsb_3
+Package ID: prsb_4:8192ca175709aabbea6a2ee51492bc97624aaf72e86e9646da94de4dc217047e, Label: prsb_4
+Package ID: prsb_7:a3fb65d5d44f07e8e2c4abcc64ae7511d71581445c53b9f9189643c661f06758, Label: prsb_7
+Package ID: prsb_8:c8f30135419e6260f079e32503bba602c6c683713ccd9c64b91412e7d5fe39ea, Label: prsb_8
+Package ID: prsb_9:cc99cc682f45810b5e7aa479c6edbead7afdc979585fde647ed0174e95295cac, Label: prsb_9
+Package ID: prsb_1:8b457b7f662b04f90364110a59a599cf9e0a005255287edacb678574f7c8de14, Label: prsb_1
+Package ID: prsb_2:66a3be811f220db8615c7a4ef8e36111acaa392b1784e32e5126790e4d333295, Label: prsb_2
