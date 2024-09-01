@@ -1,0 +1,177 @@
+# github.com/cucumber/gherkin-go/v19 v19.0.3
+github.com/cucumber/gherkin-go/v19
+# github.com/cucumber/godog v0.12.5
+github.com/cucumber/godog
+github.com/cucumber/godog/colors
+github.com/cucumber/godog/formatters
+github.com/cucumber/godog/internal/builder
+github.com/cucumber/godog/internal/flags
+github.com/cucumber/godog/internal/formatters
+github.com/cucumber/godog/internal/models
+github.com/cucumber/godog/internal/parser
+github.com/cucumber/godog/internal/storage
+github.com/cucumber/godog/internal/tags
+github.com/cucumber/godog/internal/utils
+# github.com/cucumber/messages-go/v16 v16.0.1
+github.com/cucumber/messages-go/v16
+# github.com/gofrs/uuid v4.0.0+incompatible
+github.com/gofrs/uuid
+# github.com/golang/protobuf v1.5.0
+github.com/golang/protobuf/proto
+github.com/golang/protobuf/ptypes
+github.com/golang/protobuf/ptypes/any
+github.com/golang/protobuf/ptypes/duration
+github.com/golang/protobuf/ptypes/empty
+github.com/golang/protobuf/ptypes/timestamp
+# github.com/google/uuid v1.3.0
+github.com/google/uuid
+# github.com/hashicorp/go-immutable-radix v1.3.0
+github.com/hashicorp/go-immutable-radix
+# github.com/hashicorp/go-memdb v1.3.0
+github.com/hashicorp/go-memdb
+# github.com/hashicorp/golang-lru v0.5.4
+github.com/hashicorp/golang-lru/simplelru
+# github.com/hyperledger-labs/cc-tools v0.0.0-20230925111202-1b51d7cd3cc5
+github.com/hyperledger-labs/cc-tools/assets
+github.com/hyperledger-labs/cc-tools/errors
+github.com/hyperledger-labs/cc-tools/events
+github.com/hyperledger-labs/cc-tools/mock
+github.com/hyperledger-labs/cc-tools/stubwrapper
+github.com/hyperledger-labs/cc-tools/transactions
+# github.com/hyperledger/fabric v2.1.1+incompatible
+github.com/hyperledger/fabric/bccsp
+github.com/hyperledger/fabric/bccsp/factory
+github.com/hyperledger/fabric/bccsp/pkcs11
+github.com/hyperledger/fabric/bccsp/sw
+github.com/hyperledger/fabric/bccsp/utils
+github.com/hyperledger/fabric/common/flogging
+github.com/hyperledger/fabric/common/flogging/fabenc
+github.com/hyperledger/fabric/common/util
+# github.com/hyperledger/fabric-chaincode-go v0.0.0-20210603161043-af0e3898842a
+github.com/hyperledger/fabric-chaincode-go/pkg/attrmgr
+github.com/hyperledger/fabric-chaincode-go/pkg/cid
+github.com/hyperledger/fabric-chaincode-go/shim
+github.com/hyperledger/fabric-chaincode-go/shim/internal
+# github.com/hyperledger/fabric-protos-go v0.0.0-20210528200356-82833ecdac31
+github.com/hyperledger/fabric-protos-go/common
+github.com/hyperledger/fabric-protos-go/ledger/queryresult
+github.com/hyperledger/fabric-protos-go/ledger/rwset
+github.com/hyperledger/fabric-protos-go/msp
+github.com/hyperledger/fabric-protos-go/peer
+# github.com/miekg/pkcs11 v1.0.3
+github.com/miekg/pkcs11
+# github.com/pkg/errors v0.9.1
+github.com/pkg/errors
+# github.com/spf13/pflag v1.0.5
+github.com/spf13/pflag
+# github.com/sykesm/zap-logfmt v0.0.4
+github.com/sykesm/zap-logfmt
+# go.uber.org/atomic v1.6.0
+go.uber.org/atomic
+# go.uber.org/multierr v1.5.0
+go.uber.org/multierr
+# go.uber.org/zap v1.16.0
+go.uber.org/zap
+go.uber.org/zap/buffer
+go.uber.org/zap/internal/bufferpool
+go.uber.org/zap/internal/color
+go.uber.org/zap/internal/exit
+go.uber.org/zap/zapcore
+go.uber.org/zap/zapgrpc
+# golang.org/x/crypto v0.0.0-20210920023735-84f357641f63
+golang.org/x/crypto/sha3
+# golang.org/x/net v0.0.0-20210917221730-978cfadd31cf
+golang.org/x/net/http/httpguts
+golang.org/x/net/http2
+golang.org/x/net/http2/hpack
+golang.org/x/net/idna
+golang.org/x/net/internal/timeseries
+golang.org/x/net/trace
+# golang.org/x/sys v0.0.0-20210806184541-e5e7981a1069
+golang.org/x/sys/cpu
+golang.org/x/sys/internal/unsafeheader
+golang.org/x/sys/unix
+# golang.org/x/text v0.3.7
+golang.org/x/text/secure/bidirule
+golang.org/x/text/transform
+golang.org/x/text/unicode/bidi
+golang.org/x/text/unicode/norm
+# google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013
+google.golang.org/genproto/googleapis/rpc/status
+# google.golang.org/grpc v1.35.0
+google.golang.org/grpc
+google.golang.org/grpc/attributes
+google.golang.org/grpc/backoff
+google.golang.org/grpc/balancer
+google.golang.org/grpc/balancer/base
+google.golang.org/grpc/balancer/grpclb/state
+google.golang.org/grpc/balancer/roundrobin
+google.golang.org/grpc/binarylog/grpc_binarylog_v1
+google.golang.org/grpc/codes
+google.golang.org/grpc/connectivity
+google.golang.org/grpc/credentials
+google.golang.org/grpc/encoding
+google.golang.org/grpc/encoding/proto
+google.golang.org/grpc/grpclog
+google.golang.org/grpc/internal
+google.golang.org/grpc/internal/backoff
+google.golang.org/grpc/internal/balancerload
+google.golang.org/grpc/internal/binarylog
+google.golang.org/grpc/internal/buffer
+google.golang.org/grpc/internal/channelz
+google.golang.org/grpc/internal/credentials
+google.golang.org/grpc/internal/envconfig
+google.golang.org/grpc/internal/grpclog
+google.golang.org/grpc/internal/grpcrand
+google.golang.org/grpc/internal/grpcsync
+google.golang.org/grpc/internal/grpcutil
+google.golang.org/grpc/internal/metadata
+google.golang.org/grpc/internal/resolver
+google.golang.org/grpc/internal/resolver/dns
+google.golang.org/grpc/internal/resolver/passthrough
+google.golang.org/grpc/internal/resolver/unix
+google.golang.org/grpc/internal/serviceconfig
+google.golang.org/grpc/internal/status
+google.golang.org/grpc/internal/syscall
+google.golang.org/grpc/internal/transport
+google.golang.org/grpc/internal/transport/networktype
+google.golang.org/grpc/keepalive
+google.golang.org/grpc/metadata
+google.golang.org/grpc/peer
+google.golang.org/grpc/resolver
+google.golang.org/grpc/serviceconfig
+google.golang.org/grpc/stats
+google.golang.org/grpc/status
+google.golang.org/grpc/tap
+# google.golang.org/protobuf v1.28.0
+google.golang.org/protobuf/encoding/prototext
+google.golang.org/protobuf/encoding/protowire
+google.golang.org/protobuf/internal/descfmt
+google.golang.org/protobuf/internal/descopts
+google.golang.org/protobuf/internal/detrand
+google.golang.org/protobuf/internal/encoding/defval
+google.golang.org/protobuf/internal/encoding/messageset
+google.golang.org/protobuf/internal/encoding/tag
+google.golang.org/protobuf/internal/encoding/text
+google.golang.org/protobuf/internal/errors
+google.golang.org/protobuf/internal/filedesc
+google.golang.org/protobuf/internal/filetype
+google.golang.org/protobuf/internal/flags
+google.golang.org/protobuf/internal/genid
+google.golang.org/protobuf/internal/impl
+google.golang.org/protobuf/internal/order
+google.golang.org/protobuf/internal/pragma
+google.golang.org/protobuf/internal/set
+google.golang.org/protobuf/internal/strs
+google.golang.org/protobuf/internal/version
+google.golang.org/protobuf/proto
+google.golang.org/protobuf/reflect/protodesc
+google.golang.org/protobuf/reflect/protoreflect
+google.golang.org/protobuf/reflect/protoregistry
+google.golang.org/protobuf/runtime/protoiface
+google.golang.org/protobuf/runtime/protoimpl
+google.golang.org/protobuf/types/descriptorpb
+google.golang.org/protobuf/types/known/anypb
+google.golang.org/protobuf/types/known/durationpb
+google.golang.org/protobuf/types/known/emptypb
+google.golang.org/protobuf/types/known/timestamppb

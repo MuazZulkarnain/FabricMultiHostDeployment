@@ -1,0 +1,2 @@
+Installed chaincodes on peer:
+Package ID: IoT-cc_1:a7d9cff7bb06473dea4d90a12368c5dd9ba473a2da2583d9ec9c25eb69adb3df, Label: IoT-cc_1
