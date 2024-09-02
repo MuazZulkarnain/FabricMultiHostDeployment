@@ -144,7 +144,7 @@ Orderer: &OrdererDefaults
     - orderer2.example.com:8050
     - orderer3.example.com:9050
 
-  BatchTimeout: 3s
+  BatchTimeout: 4s
   BatchSize:
     MaxMessageCount: 771
     AbsoluteMaxBytes: 99 MB
